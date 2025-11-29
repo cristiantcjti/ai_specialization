@@ -11,7 +11,9 @@ dependencies = [
     "nltk>=3.9.2",
     "numpy>=2.3.4",
     "openai>=2.6.1",
+    "pre-commit>=4.5.0",
     "pydantic>=2.12.3",
+    "qdrant-client>=1.16.1",
     "rank-bm25>=0.2.2",
     "scikit-learn>=1.7.2",
     "sentence-transformers>=5.1.2",
@@ -22,3 +24,48 @@ dependencies = [
 dev = [
     "ipykernel>=7.1.0",
 ]
+
+
+[tool.ruff]
+include = ['api/**.py']
+line-length = 79
+
+[tool.ruff.lint]
+select = [
+  "E",
+  "F",
+  "I",
+  "N",
+  "C90",
+  "UP",
+  "YTT",
+  "ASYNC",
+  "S",
+  "A",
+  "B",
+  "FBT",
+  "BLE",
+  "COM",
+  "C4",
+  "T10",
+  "ANN",
+]
+ignore = ["COM812", "E501", "ANN401"]
+
+
+[tool.ruff.lint.extend-per-file-ignores]
+"api/tests/**/*.py" = [
+  # at least this three should be fine in tests:
+  "S101", # asserts allowed in tests...
+  "ARG",  # Unused function args -> fixtures nevertheless are functionally relevant...
+  "FBT",  # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
+  # The below are debateable
+  "PLR2004", # Magic value used in comparison, ...
+  "S311",    # Standard pseudo-random generators are not suitable for cryptographic purposes
+  "ANN",
+]
+
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
