@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "docling>=2.64.0",
     "dotenv>=0.9.9",
     "fastapi>=0.120.0",
     "groq>=0.36.0",
