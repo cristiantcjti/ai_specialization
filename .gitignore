@@ -156,3 +156,6 @@ rag/db/chroma.sqlite3
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# AI Assistants
+.claude
