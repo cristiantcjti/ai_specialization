@@ -1,7 +1,10 @@
+from typing import Any
+
 import numpy as np
-from sentence_transformers import SentenceTransformer
-from groq import Groq
 from dotenv import load_dotenv
+from groq import Groq
+from numpy.typing import NDArray
+from sentence_transformers import SentenceTransformer
 
 load_dotenv()
 
@@ -23,7 +26,7 @@ model = SentenceTransformer("all-MiniLM-L6-v2")
 client = Groq()
 
 doc_embeddings = model.encode(documents)
-doc_embeddings
+print("Document embeddings shape:", doc_embeddings.shape)
 
 # ### Como calcular o angulo entre vetores ###
 # v1 = np.array([1, 2, 3])
@@ -33,7 +36,7 @@ doc_embeddings
 # dot_product = np.dot(v1, v2)
 # dot_product
 
-# # Normas euclidianas - sqrt(1) + sqrt(2) + sqrt(3) * sqrt(4) + sqrt(5) + sqrt(6) 
+# # Normas euclidianas - sqrt(1) + sqrt(2) + sqrt(3) * sqrt(4) + sqrt(5) + sqrt(6)
 # norm_euclidian = np.linalg.norm(v1) * np.linalg.norm(v2)  # ≈ 32.83
 # norm_euclidian
 
@@ -41,49 +44,55 @@ doc_embeddings
 # similarity = dot_product / norm_euclidian  # ≈ 0.9746 (97%) de similaridade
 # similarity
 
-def cosine_similarity(a, b):
+
+def cosine_similarity(a: NDArray[Any], b: NDArray[Any]) -> np.floating[Any]:
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 
-def retrieve(query, top_k=3):
+def retrieve(query: str, top_k: int = 3) -> list[tuple[str, Any]]:
     query_embedding = model.encode([query])
     similarities = []
     for index, doc_emb in enumerate(doc_embeddings):
         sim = cosine_similarity(query_embedding, doc_emb)
         similarities.append((index, sim))
-        
+
     similarities.sort(key=lambda x: x[1], reverse=True)
     return [(documents[index], sim) for index, sim in similarities[:top_k]]
-    
 
-def generate_answer(query, retrieve_docs):
+
+def generate_answer(
+    query: str, retrieve_docs: list[tuple[str, Any]]
+) -> str | None:
     contexto = "\n".join([doc for doc, _ in retrieve_docs])
-    
+
     response = client.chat.completions.create(
         model="llama-3.1-8b-instant",
         messages=[
             {
                 "role": "system",
-                "content": "Você é um especialista em machine learning. Use apenas o contexto fornecido para responder as perguntas."
+                "content": "Você é um especialista em machine learning. Use apenas o contexto fornecido para responder as perguntas.",
             },
             {
-                "role": "user", "content": f"Contexto:\n{contexto}\n\nPergunta: {query}",
-            }
+                "role": "user",
+                "content": f"Contexto:\n{contexto}\n\nPergunta: {query}",
+            },
         ],
-        temperature=0
+        temperature=0,
     )
-    
+
     return response.choices[0].message.content
 
-def rag(query, top_k=3):
+
+def rag(
+    query: str, top_k: int = 3
+) -> tuple[str | None, list[tuple[str, Any]]]:
     retrieved = retrieve(query=query, top_k=top_k)
     answer = generate_answer(query=query, retrieve_docs=retrieved)
-    return answer, retrieved 
+    return answer, retrieved
 
-answer, docs = rag("O que é machine learning?")
+
+answer, docs = rag("Machine learning usa estatística?")
 
 print(answer)
 for doc, similarity in docs:
     print(f"- {similarity}: {doc}")
-    
-
