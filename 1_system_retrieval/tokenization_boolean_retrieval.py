@@ -1,11 +1,12 @@
 import os
-import nltk
 import shutil
-from whoosh.index import create_in
-from whoosh.fields import *
-from whoosh.qparser import QueryParser
-
 import warnings
+from typing import Any
+
+import nltk
+from whoosh.fields import ID, TEXT, Schema
+from whoosh.index import create_in
+from whoosh.qparser import QueryParser
 
 nltk.download("stopwords")
 
@@ -26,11 +27,15 @@ documents = [
 ]
 
 
-def preprocess(text):
+def preprocess(text: str) -> list[str]:
     text = text.lower()
     tokens = nltk.word_tokenize(text)
     tokens = [word for word in tokens if word.isalnum()]
-    stopwords = set(nltk.corpus.stopwords.words("portuguese")) - {"e", "ou", "não"}
+    stopwords = set(nltk.corpus.stopwords.words("portuguese")) - {
+        "e",
+        "ou",
+        "não",
+    }
     tokens = [word for word in tokens if word not in stopwords]
     return tokens
 
@@ -57,7 +62,7 @@ writer.commit()
 query = "machine E learning"
 
 
-def boolean_search(query, index):
+def boolean_search(query: str, index: Any) -> list[tuple[str, str]]:
     parser = QueryParser("content", schema=index.schema)
     print("parser:", parser)
     parsed_query = parser.parse(query)

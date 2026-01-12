@@ -1,8 +1,7 @@
 import nltk
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-
-
+import numpy as np
+from numpy.typing import NDArray
+from rank_bm25 import BM25Okapi
 
 documents = [
     "Machine learning é um campo da inteligência artificial que permite que computadores aprendam padrões a partir de dados.",
@@ -19,47 +18,33 @@ documents = [
 ]
 
 
-def preprocess(text):
+def preprocess(text: str) -> list[str]:
     # 1. Converter para minúsculas
     text = text.lower()
 
     # 2. Tokenizar
     tokens = nltk.word_tokenize(text)
-    
+
     # 3. Filtrar apenas tokens alfanuméricos
     return [word for word in tokens if word.isalnum()]
 
 
-preprocessed_docs = [
-    ' '.join(preprocess(doc)) for doc in documents
-]
+tokenized_docs = [preprocess(doc) for doc in documents]
+print("Tokenized docs:", tokenized_docs)
 
-print("Preprocessed: ", preprocessed_docs)
+bm25 = BM25Okapi(tokenized_docs)
 
-vectorizer = TfidfVectorizer()
-
-tfidf_matrix = vectorizer.fit_transform(preprocessed_docs)
-
-tfidf_matrix
-
-# start retrivel
 query = "machine learning"
 
-def search_tfidf(query, vectorizer, tfidf_matrix):
-    query_vector = vectorizer.transform([query])
-    ## query_vector
-    # Math the distance between the query and the documents
-    similarities = cosine_similarity(tfidf_matrix, query_vector).flatten()
-    sorted_similarities = list(enumerate(similarities))
-    ##sorted_similarity
-    # Sort by similarity and not by the index from higher to lower.
-    results = sorted(sorted_similarities, key=lambda x: x[1], reverse=True)
-    return results
+
+def search_bm25(query: str, bm25: BM25Okapi) -> NDArray[np.float64]:
+    tokenized_query = preprocess(query)
+    return bm25.get_scores(tokenized_query)
 
 
-search_similarities = search_tfidf(query=query, vectorizer=vectorizer, tfidf_matrix=tfidf_matrix)
-search_similarities
+results = search_bm25(query=query, bm25=bm25)
+print("BM25 scores:", results)
 
-print(f"Top 10 documents by similarity score {query}: ")
-for doc_index, score in search_similarities[:10]:
-    print(f"Document {doc_index}: {documents[doc_index]}")
+sorted_results = np.argsort(results)[::-1]
+for sorted_result in sorted_results:
+    print(f"Document: {sorted_result}: {documents[sorted_result]}")

@@ -4,11 +4,11 @@ nltk.download("punkt_tab")  # Modelo de tokenização punkt
 
 text = "Machine Learning é um campo da inteligência artificial que permite que computadores aprendam."
 
-#Tokenização por palavras
+# Tokenização por palavras
 word_tokens = nltk.word_tokenize(text)
 print(word_tokens)
 
-#Output: ['Machine', 'Learning', 'é', 'um', 'campo', 'da', 'inteligência', ...]
+# Output: ['Machine', 'Learning', 'é', 'um', 'campo', 'da', 'inteligência', ...]
 
 
 text = "Machine Learning é um campo da inteligência artificial. Ele permite que os sistemas façam previsões."
@@ -22,7 +22,7 @@ print(sentence_tokens)
 #  'Ele permite que os sistemas façam previsões.']
 
 
-def preprocess(text):
+def preprocess(text: str) -> list[str]:
     # Tokenização por palavras
     tokens = nltk.word_tokenize(text)
 
