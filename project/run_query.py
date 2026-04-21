@@ -25,6 +25,7 @@ colbert_model = LateInteractionTextEmbedding(COLBERT_MODEL)
 
 
 query_text = "What are the main financial risks?"
+query_text = "What about our business in Israel defense ministry?"
 query_dense = list(dense_model.query_embed([query_text]))[0].tolist()
 query_sparse_obj = list(sparse_model.query_embed([query_text]))[0].as_object()
 query_sparse = models.SparseVector(
