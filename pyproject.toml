@@ -12,6 +12,7 @@ dependencies = [
     "groq>=0.36.0",
     "hdbscan>=0.8.41",
     "langextract>=1.1.1",
+    "mem0ai",
     "nltk>=3.9.2",
     "numpy>=2.3.4",
     "openai>=2.6.1",
@@ -77,3 +78,6 @@ ignore = ["COM812", "E501", "ANN401"]
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
+
+[tool.uv.sources]
+mem0ai = { git = "https://github.com/mem0ai/mem0.git" }
