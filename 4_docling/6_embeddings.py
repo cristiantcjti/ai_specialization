@@ -5,8 +5,11 @@ from docling_core.transforms.chunker.hybrid_chunker import HybridChunker
 from docling_core.transforms.chunker.tokenizer.huggingface import (
     HuggingFaceTokenizer,
 )
+from dotenv import load_dotenv
 from qdrant_client import QdrantClient, models
 from transformers import AutoTokenizer
+
+load_dotenv()
 
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 MAX_TOKENS = 300
